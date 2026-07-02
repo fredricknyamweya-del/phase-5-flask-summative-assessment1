@@ -35,8 +35,8 @@ def view_one_item():
 
 def add_item():
     name = input("Enter item name: ")
-    quantity = input("Enter quantity: (integer) ")
-    price = input("Enter price: (float): ")
+    quantity = input("Enter quantity (integer): ")
+    price = input("Enter price (float): ")
     
     try:
         quantity = int(quantity)
@@ -47,8 +47,8 @@ def add_item():
 
     payload = {
         "name": name,
-        "quantity": int(quantity),
-        "price": float(price)
+        "quantity": quantity,
+        "price": price
     }
 
     response = requests.post(f"{BASE_URL}/inventory", json=payload)
@@ -59,12 +59,41 @@ def add_item():
     else:
         print("Error: Could not add item.\n")
 
+def update_item():
+    item_id = input("Enter the item ID to update: ")
+    field = input("Which field do you want to update (price/quantity)? ").strip().lower()
+    new_value = input(f"Enter new value for {field}: ")
+
+    try:
+        if field == "price":
+            payload = {"price": float(new_value)}
+        elif field == "quantity":
+            payload = {"quantity": int(new_value)}
+        else:
+            print("Invalid field. Only 'price' or 'quantity' can be updated.\n")
+            return
+    except ValueError:
+        print("Error: Value must be a number.\n")
+        return
+
+    response = requests.patch(f"{BASE_URL}/inventory/{item_id}", json=payload)
+
+    if response.status_code == 404:
+        print(f"Item with ID {item_id} not found.\n")
+    elif response.status_code == 200:
+        item = response.json()
+        print("\nItem updated successfully:")
+        print(f"ID: {item['id']} | Name: {item['name']} | Quantity: {item['quantity']} | Price: {item['price']}\n")
+    else:
+        print("Error: Could not update item.\n")
+
 def main_menu():
     while True:
         print("=== Inventory Management CLI ===")
         print("1. View all items")
         print("2. View one item by ID")
         print("3. Add new item")
+        print("4. Update item")
         print("0. Exit")
         choice = input("Enter your choice: ")
 
@@ -74,6 +103,8 @@ def main_menu():
             view_one_item()
         elif choice == "3":
             add_item()
+        elif choice == "4":
+            update_item()
         elif choice == "0":
             print("Goodbye!")
             break
