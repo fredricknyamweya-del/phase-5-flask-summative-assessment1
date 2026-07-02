@@ -87,6 +87,17 @@ def update_item():
     else:
         print("Error: Could not update item.\n")
 
+def delete_item():
+    item_id = input("Enter the item ID to delete: ")
+    response = requests.delete(f"{BASE_URL}/inventory/{item_id}")
+
+    if response.status_code == 404:
+        print(f"Item with ID {item_id} not found.\n")
+    elif response.status_code == 200:
+        print(f"Item with ID {item_id} deleted successfully.\n")
+    else:
+        print("Error: Could not delete item.\n")
+
 def main_menu():
     while True:
         print("=== Inventory Management CLI ===")
@@ -94,6 +105,7 @@ def main_menu():
         print("2. View one item by ID")
         print("3. Add new item")
         print("4. Update item")
+        print("5. Delete item")
         print("0. Exit")
         choice = input("Enter your choice: ")
 
@@ -105,6 +117,8 @@ def main_menu():
             add_item()
         elif choice == "4":
             update_item()
+        elif choice == "5":
+            delete_item()
         elif choice == "0":
             print("Goodbye!")
             break
