@@ -8,7 +8,10 @@ def index():
     return jsonify({"message": "Welcome to the Inventory Management System API!",
                     "endpoints": {
                         "GET /inventory": "View all inventory items",
-                        "GET /inventory/<int:item_id>": "View a single inventory item by ID"
+                        "GET /inventory/<int:item_id>": "View a single inventory item by ID",
+                        "POST /inventory": "Add a new inventory item",
+                        "PATCH /inventory/<int:item_id>": "Update an existing inventory item",
+                        "DELETE /inventory/<int:item_id>": "Delete an inventory item by ID"
                     }
     })
     
@@ -58,6 +61,15 @@ def update_inventory_item(item_id):
     
     item.update(updates)
     return jsonify(item), 200
+
+@app.route('/inventory/<int:item_id>', methods=['DELETE'])
+def delete_inventory_item(item_id):
+    item =next((item for item in inventory if item["id"] == item_id), None)
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+    
+    inventory.remove(item)
+    return jsonify({"message": f"Item {item_id} deleted successfully"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
