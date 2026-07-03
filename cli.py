@@ -98,6 +98,39 @@ def delete_item():
     else:
         print("Error: Could not delete item.\n")
 
+def search_product():
+    barcode = input("Enter product barcode: ")
+    response = requests.get(f"{BASE_URL}/inventory/search/{barcode}")
+
+    if response.status_code == 404:
+        print(f"No product found for barcode {barcode}.\n")
+        return
+    elif response.status_code != 200:
+        print("Error: Could not search product.\n")
+        return
+
+    product = response.json()
+    print("\n--- Product Details ---")
+    print(f"Name: {product.get('product_name', 'N/A')}")
+    print(f"Brands: {product.get('brands', 'N/A')}")
+    print(f"Ingredients: {product.get('ingredients_text', 'N/A')}")
+    print("-----------------------\n")
+
+    choice = input("Do you want to add this product to inventory? (y/n): ").strip().lower()
+    if choice == "y":
+        payload = {
+            "name": product.get("product_name", "Unknown"),
+            "quantity": 1,
+            "price": 0.0
+        }
+        add_response = requests.post(f"{BASE_URL}/inventory", json=payload)
+
+        if add_response.status_code == 201:
+            new_item = add_response.json()
+            print(f"Added to inventory: ID {new_item['id']} | {new_item['name']}\n")
+        else:
+            print("Error: Could not add product to inventory.\n")
+
 def main_menu():
     while True:
         print("=== Inventory Management CLI ===")
@@ -106,6 +139,7 @@ def main_menu():
         print("3. Add new item")
         print("4. Update item")
         print("5. Delete item")
+        print("6. Search product by barcode (external API)")
         print("0. Exit")
         choice = input("Enter your choice: ")
 
@@ -119,6 +153,8 @@ def main_menu():
             update_item()
         elif choice == "5":
             delete_item()
+        elif choice == "6":
+            search_product()
         elif choice == "0":
             print("Goodbye!")
             break
