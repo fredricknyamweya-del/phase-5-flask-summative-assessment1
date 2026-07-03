@@ -63,5 +63,21 @@ def update_inventory_item(item_id):
     item.update(updates)
     return jsonify(item), 200
 
+@app.route('/inventory/<int:item_id>', methods=['DELETE'])
+def delete_inventory_item(item_id):
+    item = next((item for item in inventory if item["id"] == item_id), None)
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+
+    inventory.remove(item)
+    return jsonify({"message": f"Item {item_id} deleted successfully"}), 200
+
+@app.route("/inventory/search/<barcode>", methods=['GET'])
+def search_inventory(barcode):
+    product = fetch_product(barcode)
+    if product is None:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify(product), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
