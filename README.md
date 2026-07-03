@@ -19,18 +19,6 @@ A simple Flask-based Inventory Management System that provides a REST API to man
 - requests
 - pytest
 
-## Project Structure
-
-phase-5-flask-summative-assessment1/
-├── app.py            # Flask application and HTTP routes
-├── cli.py            # CLI client for interacting with the API
-├── data.py           # In-memory mock database (list of items)
-├── external_api.py   # Helper to fetch product data from OpenFoodFacts
-├── Pipfile           # Dependencies (Pipenv)
-├── tests/            # Tests and test-specific README
-│   ├── test_app.py
-│   └── test_external_api.py
-
 ## Installation
 
 Clone the repository and install dependencies (Pipenv recommended):
