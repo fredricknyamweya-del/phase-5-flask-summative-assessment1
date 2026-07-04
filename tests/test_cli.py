@@ -1,5 +1,6 @@
 from unittest.mock import patch, MagicMock
-from cli import view_all_items, view_one_item, update_item
+from cli import view_all_items, view_one_item, update_item, delete_item
+
 
 def test_view_all_items(capsys):
     fake_response = MagicMock()
@@ -71,3 +72,29 @@ def test_update_item_invalid_field(capsys):
     captured = capsys.readouterr()
     # Match the CLI’s actual invalid field message
     assert "Invalid field" in captured.out
+
+
+def test_delete_item_success(capsys):
+    fake_response = MagicMock()
+    fake_response.status_code = 200
+    fake_response.json.return_value = {"message": "Item deleted"}
+
+    with patch("cli.requests.delete", return_value=fake_response), \
+         patch("builtins.input", return_value="1"):
+        delete_item()
+
+    captured = capsys.readouterr()
+    assert "deleted" in captured.out
+
+
+def test_delete_item_not_found(capsys):
+    fake_response = MagicMock()
+    fake_response.status_code = 404
+    fake_response.json.return_value = {"error": "Item not found"}
+
+    with patch("cli.requests.delete", return_value=fake_response), \
+         patch("builtins.input", return_value="99"):
+        delete_item()
+
+    captured = capsys.readouterr()
+    assert "not found" in captured.out
