@@ -1,10 +1,21 @@
-inventory = [
-    {"id": 1, "name": "Milk 500ml", "quantity": 24, "price": 60.0},
-    {"id": 2, "name": "White Bread 400g", "quantity": 12, "price": 65.0},
-    {"id": 3, "name": "Eggs 12pcs", "quantity": 30, "price": 150.0},
-    {"id": 4, "name": "Sugar 2kg", "quantity": 15, "price": 250.0},
-    {"id": 5, "name": "Salt 1kg", "quantity": 20, "price": 100.0},
-    {"id": 6, "name": "Rice 5kg", "quantity": 10, "price": 500.0},
-    {"id": 7, "name": "Cooking Oil 1L", "quantity": 18, "price": 300.0},
-    {"id": 8, "name": "Pasta 500g", "quantity": 25, "price": 120.0},
+from external_api import fetch_product
+
+# Real barcodes to merge the inventory with actual OpenFoodFacts data
+barcodes = [
+    "3017620422003",   # Nutella
+    "5059319023533",   # Rice Krispies
+    "5000442007594",   # Olive oil
+    "3760049790214",   # Pain De Mie Bio (bread)
 ]
+
+inventory = []
+
+for index, barcode in enumerate(barcodes, start=1):
+    product = fetch_product(barcode)
+    if product:
+        inventory.append({
+            "id": index,
+            "name": product["product_name"],
+            "quantity": 10,
+            "price": 100.0
+        })
