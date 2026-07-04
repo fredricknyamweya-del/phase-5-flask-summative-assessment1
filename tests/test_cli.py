@@ -66,7 +66,7 @@ def test_update_item_success(capsys):
 
 
 def test_update_item_invalid_field(capsys):
-    with patch("builtins.input", side_effect=["1", "name", "something"]):
+    with patch("builtins.input", side_effect=["1", "invalid_field", "something"]):
         update_item()
 
     captured = capsys.readouterr()

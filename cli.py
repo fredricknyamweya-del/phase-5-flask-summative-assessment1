@@ -61,7 +61,7 @@ def add_item():
 
 def update_item():
     item_id = input("Enter the item ID to update: ")
-    field = input("Which field do you want to update (price/quantity)? ").strip().lower()
+    field = input("Which field do you want to update (price/quantity/name)? ").strip().lower()
     new_value = input(f"Enter new value for {field}: ")
 
     try:
@@ -69,8 +69,10 @@ def update_item():
             payload = {"price": float(new_value)}
         elif field == "quantity":
             payload = {"quantity": int(new_value)}
+        elif field == "name":
+            payload = {"name": new_value}
         else:
-            print("Invalid field. Only 'price' or 'quantity' can be updated.\n")
+            print("Invalid field. Only 'price', 'quantity', or 'name' can be updated.\n")
             return
     except ValueError:
         print("Error: Value must be a number.\n")
