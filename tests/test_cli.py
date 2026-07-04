@@ -1,0 +1,45 @@
+from unittest.mock import patch, MagicMock
+from cli import view_all_items, view_one_item
+
+def test_view_all_items(capsys):
+    fake_response = MagicMock()
+    fake_response.status_code = 200
+    fake_response.json.return_value = [
+        {"id": 1, "name": "Nutella", "quantity": 10, "price": 100.0}
+    ]
+
+    with patch("cli.requests.get", return_value=fake_response):
+        view_all_items()
+
+    captured = capsys.readouterr()
+    assert "Nutella" in captured.out
+
+
+def test_view_one_item_found(capsys):
+    fake_response = MagicMock()
+    fake_response.status_code = 200
+    fake_response.json.return_value = {
+        "id": 1,
+        "name": "Nutella",
+        "quantity": 10,
+        "price": 100.0,
+    }
+
+    with patch("cli.requests.get", return_value=fake_response), patch("builtins.input", return_value="1"):
+        view_one_item()
+
+    captured = capsys.readouterr()
+    assert "Nutella" in captured.out
+
+
+def test_view_one_item_not_found(capsys):
+    fake_response = MagicMock()
+    fake_response.status_code = 404
+    fake_response.json.return_value = {"error": "Item not found"}
+
+    with patch("cli.requests.get", return_value=fake_response), patch("builtins.input", return_value="99"):
+        view_one_item()
+
+    captured = capsys.readouterr()
+    # Match the CLI’s actual print message, not the JSON
+    assert "not found" in captured.out
