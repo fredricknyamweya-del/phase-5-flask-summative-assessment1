@@ -79,5 +79,26 @@ def search_inventory(barcode):
         return jsonify({"error": "Product not found"}), 404
     return jsonify(product), 200
 
+@app.route("/inventory/search/<barcode>", methods=['POST'])
+def add_product_to_inventory(barcode):
+    """
+    Fetch the product details from the external API using the barcode and add it to the inventory with default values.
+    """
+    
+    product = fetch_product(barcode)
+    if product is None:
+        return jsonify({"error": "Product not found"}), 404
+    
+    new_id = max([item["id"] for item in inventory], default=0) + 1
+    
+    new_item = {
+        "id": new_id,
+        "name": product.get("product_name", "Unknown Product"),
+        "quantity": 0,
+        "price": 0.0
+    }
+    inventory.append(new_item)
+    return jsonify(new_item), 201
+
 if __name__ == '__main__':
     app.run(debug=True)
