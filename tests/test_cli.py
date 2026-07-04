@@ -1,6 +1,5 @@
 from unittest.mock import patch, MagicMock
-from cli import view_all_items, view_one_item, add_item
-
+from cli import view_all_items, view_one_item, update_item
 
 def test_view_all_items(capsys):
     fake_response = MagicMock()
@@ -46,34 +45,29 @@ def test_view_one_item_not_found(capsys):
     assert "not found" in captured.out
 
 
-def test_add_item_success(capsys):
+def test_update_item_success(capsys):
     fake_response = MagicMock()
-    fake_response.status_code = 201
+    fake_response.status_code = 200
     fake_response.json.return_value = {
-        "id": 5,
-        "name": "Rice",
-        "quantity": 20,
-        "price": 300.0,
+        "id": 1,
+        "name": "Nutella",
+        "quantity": 10,
+        "price": 150.0,  # updated price
     }
 
-    with patch("cli.requests.post", return_value=fake_response), \
-         patch("builtins.input", side_effect=["Rice", "20", "300.0"]):
-        add_item()
+    with patch("cli.requests.patch", return_value=fake_response), \
+         patch("builtins.input", side_effect=["1", "price", "150.0"]):
+        update_item()
 
     captured = capsys.readouterr()
-    assert "Rice" in captured.out
+    assert "Nutella" in captured.out
+    assert "150.0" in captured.out
 
 
-def test_add_item_failure_invalid_quantity(capsys):
-    fake_response = MagicMock()
-    fake_response.status_code = 400
-    fake_response.json.return_value = {"error": "Invalid input"}
-
-    # Simulate user typing: name="Rice", quantity="abc" (bad), price="300.0"
-    with patch("cli.requests.post", return_value=fake_response), \
-         patch("builtins.input", side_effect=["Rice", "abc", "300.0"]):
-        add_item()
+def test_update_item_invalid_field(capsys):
+    with patch("builtins.input", side_effect=["1", "name", "something"]):
+        update_item()
 
     captured = capsys.readouterr()
-    # Match the actual CLI error message
-    assert "must be an integer" in captured.out
+    # Match the CLI’s actual invalid field message
+    assert "Invalid field" in captured.out
