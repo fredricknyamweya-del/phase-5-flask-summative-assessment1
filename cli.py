@@ -158,7 +158,7 @@ def main_menu():
         elif choice == "6":
             search_product()
         elif choice == "0":
-            print("Goodbye!")
+            print("Goodbye!. Session ended")
             break
         else:
             print("Invalid choice, please try again.\n")
